@@ -71,7 +71,7 @@ export class AuthService {
     }
 
     logout() {
-        this.updateState(this.initalState);
+        this.updateState({ profile: null, tokens: null});
         if (this.refreshSubscription$) {
             this.refreshSubscription$.unsubscribe();
         }
