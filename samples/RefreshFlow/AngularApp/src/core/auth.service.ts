@@ -21,7 +21,6 @@ import 'rxjs/add/operator/filter';
 
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/interval';
-import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/observable/throw';
 
 
@@ -71,7 +70,7 @@ export class AuthService {
     }
 
     logout() {
-        this.updateState({ profile: null, tokens: null});
+        this.updateState({ profile: null, tokens: null });
         if (this.refreshSubscription$) {
             this.refreshSubscription$.unsubscribe();
         }
@@ -95,8 +94,8 @@ export class AuthService {
         localStorage.setItem('auth-tokens', JSON.stringify(tokens));
     }
     private retrieveTokens() {
-        let tokensString = localStorage.getItem('auth-tokens');
-        let tokensModel: AuthTokenModel = tokensString == null ? null : JSON.parse(tokensString);
+        const tokensString = localStorage.getItem('auth-tokens');
+        const tokensModel: AuthTokenModel = tokensString == null ? null : JSON.parse(tokensString);
         return tokensModel;
     }
     private removeToken() {
@@ -104,26 +103,26 @@ export class AuthService {
     }
 
     private updateState(newState: AuthStateModel) {
-        let previoudState = this.state.getValue();
+        const previoudState = this.state.getValue();
         this.state.next(Object.assign({}, previoudState, newState));
     }
 
     private getTokens(data: RefreshGrantModel | LoginModel, grantType: string) {
-        let headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
-        let options = new RequestOptions({ headers: headers });
+        const headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
+        const options = new RequestOptions({ headers: headers });
 
         Object.assign(data, { grant_type: grantType, scope: 'openid offline_access' });
 
-        let params = new URLSearchParams();
+        const params = new URLSearchParams();
         Object.keys(data).forEach(key => params.append(key, (<any>data)[key]))
 
         return this.http.post('http://localhost:5056/connect/token', params.toString(), options)
             .map(res => {
-                let tokens: AuthTokenModel = res.json();
-                let now = new Date();
+                const tokens: AuthTokenModel = res.json();
+                const now = new Date();
                 tokens.expiration_date = new Date(now.getTime() + tokens.expires_in * 1000).getTime().toString();
 
-                let profile: ProfileModel = jwtDecode(tokens.id_token);
+                const profile: ProfileModel = jwtDecode(tokens.id_token);
 
                 this.storeToken(tokens);
                 this.updateState({ authReady: true, tokens, profile });
@@ -141,7 +140,7 @@ export class AuthService {
                     this.updateState({ authReady: true });
                     return Observable.throw('No token in Storage');
                 }
-                let profile: ProfileModel = jwtDecode(tokens.id_token);
+                const profile: ProfileModel = jwtDecode(tokens.id_token);
                 this.updateState({ tokens, profile });
 
                 if (+tokens.expiration_date > new Date().getTime()) {
