@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import { AuthService } from '../core/auth.service';
 import { AuthStateModel } from '../core/models/auth-state-model';
 
@@ -20,11 +20,11 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.authState$ = this.authService.state$
+        this.authState$ = this.authService.state$;
         // This starts up the token refresh preocess for the app
         this.authService.init()
             .subscribe(
-            () => { console.info('Startup success');},
+            () => { console.info('Startup success'); },
             error => console.warn(error)
             );
     }

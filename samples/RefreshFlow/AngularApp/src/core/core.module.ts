@@ -6,7 +6,6 @@ import { AuthService } from './auth.service';
     providers: [
         AuthService
     ]
-
 })
 export class CoreModule {
     constructor (@Optional() @SkipSelf() parentModule: CoreModule) {

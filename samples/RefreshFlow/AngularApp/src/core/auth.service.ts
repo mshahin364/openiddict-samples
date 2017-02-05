@@ -28,7 +28,7 @@ export class AuthService {
 
     private initalState: AuthStateModel = { profile: null, tokens: null, authReady: false };
     private authReady$ = new BehaviorSubject<boolean>(false);
-    state: BehaviorSubject<AuthStateModel>;
+    private state: BehaviorSubject<AuthStateModel>;
     private refreshSubscription$: Subscription;
 
     state$: Observable<AuthStateModel>;
@@ -41,9 +41,7 @@ export class AuthService {
     ) {
         this.state = new BehaviorSubject<AuthStateModel>(this.initalState);
         this.state$ = this.state.asObservable();
-    }
 
-    init() {
         this.tokens$ = this.state.filter(state => state.authReady)
             .map(state => state.tokens);
 
@@ -51,7 +49,9 @@ export class AuthService {
             .map(state => state.profile);
 
         this.loggedIn$ = this.tokens$.map(tokens => !!tokens);
+    }
 
+    init() {
         return this.startupTokenRefresh()
             .do(() => this.scheduleRefresh());
     }
@@ -91,11 +91,13 @@ export class AuthService {
     private storeToken(tokens: AuthTokenModel) {
         localStorage.setItem('auth-tokens', JSON.stringify(tokens));
     }
+
     private retrieveTokens() {
         const tokensString = localStorage.getItem('auth-tokens');
         const tokensModel: AuthTokenModel = tokensString == null ? null : JSON.parse(tokensString);
         return tokensModel;
     }
+
     private removeToken() {
         localStorage.removeItem('auth-tokens');
     }
@@ -127,8 +129,6 @@ export class AuthService {
                 return res;
             });
     }
-
-
 
     private startupTokenRefresh() {
         return Observable.of(this.retrieveTokens())

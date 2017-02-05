@@ -16,7 +16,6 @@ export class LoginComponent implements OnInit {
         private authService: AuthService
     ) { }
 
-
     ngOnInit(): void {
         this.loginForm = this.formBuilder.group({
             username: ['', [Validators.required]],
