@@ -23,7 +23,6 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/observable/throw';
 
-
 @Injectable()
 export class AuthService {
 
@@ -45,7 +44,6 @@ export class AuthService {
     }
 
     init() {
-
         this.tokens$ = this.state.filter(state => state.authReady)
             .map(state => state.tokens);
 
@@ -74,7 +72,7 @@ export class AuthService {
         if (this.refreshSubscription$) {
             this.refreshSubscription$.unsubscribe();
         }
-        this.removeToken()
+        this.removeToken();
     }
 
     isInRole(usersRole: string): Observable<boolean> {
@@ -114,7 +112,7 @@ export class AuthService {
         Object.assign(data, { grant_type: grantType, scope: 'openid offline_access' });
 
         const params = new URLSearchParams();
-        Object.keys(data).forEach(key => params.append(key, (<any>data)[key]))
+        Object.keys(data).forEach(key => params.append(key, (<any>data)[key]));
 
         return this.http.post('http://localhost:5056/connect/token', params.toString(), options)
             .map(res => {
@@ -135,7 +133,6 @@ export class AuthService {
     private startupTokenRefresh() {
         return Observable.of(this.retrieveTokens())
             .flatMap((tokens: AuthTokenModel) => {
-                // check if the token is even in localStorage, if it isn't tell them it's not and return
                 if (!tokens) {
                     this.updateState({ authReady: true });
                     return Observable.throw('No token in Storage');
@@ -147,7 +144,6 @@ export class AuthService {
                     this.updateState({ authReady: true });
                 }
 
-                // it if is able to refresh then the getTokens method will let the app know that we're auth ready
                 return this.refreshTokens();
             })
             .catch(error => {
