@@ -51,7 +51,7 @@ export class AuthService {
         this.loggedIn$ = this.tokens$.map(tokens => !!tokens);
     }
 
-    init() {
+    init(): Observable<AuthTokenModel> {
         return this.startupTokenRefresh()
             .do(() => this.scheduleRefresh());
     }
@@ -61,13 +61,13 @@ export class AuthService {
             .catch(res => Observable.throw(res.json()));
     }
 
-    login(user: LoginModel) {
+    login(user: LoginModel): Observable<any> {
         return this.getTokens(user, 'password')
             .catch(res => Observable.throw(res.json()))
             .do(res => this.scheduleRefresh());
     }
 
-    logout() {
+    logout(): void {
         this.updateState({ profile: null, tokens: null });
         if (this.refreshSubscription$) {
             this.refreshSubscription$.unsubscribe();
@@ -80,7 +80,7 @@ export class AuthService {
             .map(profile => profile.role.find(role => role === usersRole) !== undefined);
     }
 
-    refreshTokens() {
+    refreshTokens(): Observable<AuthTokenModel> {
         return this.state.first()
             .map(state => state.tokens)
             .flatMap(tokens => this.getTokens({ refresh_token: tokens.refresh_token }, 'refresh_token')
@@ -88,26 +88,26 @@ export class AuthService {
             );
     }
 
-    private storeToken(tokens: AuthTokenModel) {
+    private storeToken(tokens: AuthTokenModel): void {
         localStorage.setItem('auth-tokens', JSON.stringify(tokens));
     }
 
-    private retrieveTokens() {
+    private retrieveTokens(): AuthTokenModel {
         const tokensString = localStorage.getItem('auth-tokens');
         const tokensModel: AuthTokenModel = tokensString == null ? null : JSON.parse(tokensString);
         return tokensModel;
     }
 
-    private removeToken() {
+    private removeToken(): void {
         localStorage.removeItem('auth-tokens');
     }
 
-    private updateState(newState: AuthStateModel) {
+    private updateState(newState: AuthStateModel): void {
         const previoudState = this.state.getValue();
         this.state.next(Object.assign({}, previoudState, newState));
     }
 
-    private getTokens(data: RefreshGrantModel | LoginModel, grantType: string) {
+    private getTokens(data: RefreshGrantModel | LoginModel, grantType: string): Observable<Response> {
         const headers = new Headers({ 'Content-Type': 'application/x-www-form-urlencoded' });
         const options = new RequestOptions({ headers: headers });
 
@@ -130,7 +130,7 @@ export class AuthService {
             });
     }
 
-    private startupTokenRefresh() {
+    private startupTokenRefresh(): Observable<AuthTokenModel> {
         return Observable.of(this.retrieveTokens())
             .flatMap((tokens: AuthTokenModel) => {
                 if (!tokens) {
