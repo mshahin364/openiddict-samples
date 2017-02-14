@@ -1,3 +1,4 @@
+import { environment } from './../environments/environment';
 import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions, Response, URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
@@ -57,7 +58,7 @@ export class AuthService {
     }
 
     register(data: RegisterModel): Observable<Response> {
-        return this.http.post('http://localhost:5056/account/register', data)
+        return this.http.post(`${environment.baseApiUrl}/account/register`, data)
             .catch(res => Observable.throw(res.json()));
     }
 
@@ -116,8 +117,8 @@ export class AuthService {
         const params = new URLSearchParams();
         Object.keys(data).forEach(key => params.append(key, (<any>data)[key]));
 
-        return this.http.post('http://localhost:5056/connect/token', params.toString(), options)
-            .map(res => {
+        return this.http.post(`${environment.baseApiUrl}/connect/token`, params.toString(), options)
+            .do(res => {
                 const tokens: AuthTokenModel = res.json();
                 const now = new Date();
                 tokens.expiration_date = new Date(now.getTime() + tokens.expires_in * 1000).getTime().toString();
@@ -126,7 +127,6 @@ export class AuthService {
 
                 this.storeToken(tokens);
                 this.updateState({ authReady: true, tokens, profile });
-                return res;
             });
     }
 
